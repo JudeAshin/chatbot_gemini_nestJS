@@ -1,30 +1,18 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseInterceptors, UploadedFile, ParseFilePipe } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
-import { Response } from "express";
+import { ApiResponse, UsersService } from './users.service';
+import { UpdateCustomerDto } from './dto/update-user.dto';
+import { CreateCustomerDto } from './dto/create-customer.dto';
+import { Customer } from './entities/customer.entity';
+
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // Normal post methos to create a user
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto):Promise<User> {
-    return this.usersService.create(createUserDto);
-  }
-
-  // Excel sheet generation to get bulk of data's from users.
-
-  @Get('sampleCustomerExcelSheet')
-  async downloadExcel(@Res() response: Response) {
-    try {
-      await this.usersService.generateExcelFile(response);
-    } catch (error) {
-      console.error('Error generating Excel file:', error.message);
-    }
+  @Post('/identify')
+  createCustomer(customerDto:CreateCustomerDto):Promise<ApiResponse>{
+    return this.usersService.createCustomer(customerDto)
   }
 
   @Get()
@@ -38,7 +26,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateCustomerDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 

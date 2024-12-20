@@ -7,33 +7,15 @@ export class Customer extends Model<InferCreationAttributes<Customer>,InferAttri
 id:number;
 
 @Column
-customer_name:string;
-
-@Column
 customer_email:string;
-
-@Column
-customer_address:string;
 
 @Column
 mobile_no:string;
 
 @Column
-total_amount:number;
+linkedId:number;
 
 @Column
-discount:string;
-
-@Column
-product_name:string;
-
-@Column
-state:string;
-
-@Column
-city:string; 
-
-@Column
-pincode:number;
+linkPrecedence:string;
 
 }
