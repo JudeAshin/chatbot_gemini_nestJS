@@ -11,8 +11,8 @@ export class UsersController {
 
   // Normal post methos to create a user
   @Post('/identify')
-  createCustomer(customerDto:CreateCustomerDto):Promise<ApiResponse>{
-    return this.usersService.createCustomer(customerDto)
+  createCustomer(@Body()customerDto:CreateCustomerDto):Promise<ApiResponse>{
+    return this.usersService.identifyCustomer(customerDto)
   }
 
   @Get()

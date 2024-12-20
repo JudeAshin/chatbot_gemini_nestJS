@@ -7,15 +7,18 @@ export class Customer extends Model<InferCreationAttributes<Customer>,InferAttri
 id:number;
 
 @Column
-customer_email:string;
+email:string;
 
 @Column
-mobile_no:string;
+phoneNumber:number;
 
 @Column
 linkedId:number;
 
 @Column
 linkPrecedence:string;
+
+// @Column({defaultValue:false})
+// is_deleted:boolean;
 
 }

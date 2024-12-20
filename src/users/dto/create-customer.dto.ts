@@ -1,8 +1,8 @@
 export class CreateCustomerDto {
 
     id:number;
-    customer_email:string;
-    mobile_no:string;
+    email:string;
+    phoneNumber:number;
     linkedId:number;
     linkPrecedence:string;
 }
