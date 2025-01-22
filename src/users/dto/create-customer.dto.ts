@@ -6,3 +6,8 @@ export class CreateCustomerDto {
     linkedId:number;
     linkPrecedence:string;
 }
+
+export interface ChatContent {
+    agent: 'user' | 'chatbot';
+    message: string;
+}

@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseInterceptors, UploadedFile, ParseFilePipe } from '@nestjs/common';
 import { ApiResponse, UsersService } from './users.service';
 import { UpdateCustomerDto } from './dto/update-user.dto';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { Customer } from './entities/customer.entity';
+import { ChatContent, CreateCustomerDto } from './dto/create-customer.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 
 @Controller('users')
@@ -13,6 +14,22 @@ export class UsersController {
   @Post('/identify')
   createCustomer(@Body()customerDto:CreateCustomerDto):Promise<ApiResponse>{
     return this.usersService.identifyCustomer(customerDto)
+  }
+
+  @Post('chat')
+  chat(@Body() chatContent: ChatContent) {
+    return this.usersService.chat(chatContent);
+  }
+  
+  @Post('text')
+  text(@Body() chatContent: ChatContent) {
+    return this.usersService.generateText(chatContent.message);
+  }
+
+  @Post('vision')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile() file: Express.Multer.File, @Body() body: {message: string}) {
+    return this.usersService.vision(body.message, file);
   }
 
   @Get()

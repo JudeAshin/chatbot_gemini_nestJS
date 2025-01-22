@@ -2,15 +2,35 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Customer } from './entities/customer.entity';
 import { UpdateCustomerDto } from './dto/update-user.dto';
-import { CreateCustomerDto } from './dto/create-customer.dto';
+import { ChatContent, CreateCustomerDto } from './dto/create-customer.dto';
 import { Op } from 'sequelize';
-
+import {
+  ChatSession,GenerativeModel,GoogleGenerativeAI,InlineDataPart} from '@google/generative-ai';
 @Injectable()
 export class UsersService {
+  model: GenerativeModel;
+  imagemodel: GenerativeModel;
+  chatSession: ChatSession;
   constructor(
     @InjectModel(Customer)
     private customerModel: typeof Customer ,
-  ){}
+  ){
+    const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+    this.model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    this.imagemodel = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+    this.chatSession = this.model.startChat({
+      history: [
+        {
+          role: 'user',
+          parts: [{ text: "You're a poet. Respond to all questions with a rhyming poem. What is the capital of California?" }],
+        },
+        {
+          role: 'model',
+          parts:[{text: "If the capital of California is what you seek, Sacramento is where you ought to peek."}],
+        },
+      ],
+    });
+  }
 
   async identifyCustomer(customerDto: CreateCustomerDto): Promise<ApiResponse> {
     const { email, phoneNumber } = customerDto;
@@ -78,6 +98,45 @@ export class UsersService {
         secondaryContactIds: Array.from(secondaryContactIds),
       }
     });
+  }
+
+  async chat(chatContent: ChatContent): Promise<ChatContent> {
+    const result = await this.chatSession.sendMessage(chatContent.message);
+    const response = await result.response;
+    const text = response.text();
+
+    return {
+      message: text,
+      agent: 'chatbot',
+    };
+  }
+
+  async generateText(message: string): Promise<ChatContent> {
+    const result = await this.model.generateContent(message);
+    const response = await result.response;
+    const text = response.text();
+
+    return {
+      message: text,
+      agent: 'chatbot',
+    };
+  }
+
+  async vision(message: string, file: Express.Multer.File): Promise<ChatContent> {
+    const imageDataPart: InlineDataPart = {
+        inlineData: {
+          data: file.buffer.toString('base64'),
+          mimeType: file.mimetype,
+        },
+      };
+    const result = await this.imagemodel.generateContent([message, imageDataPart]);
+    const response = await result.response;
+    const text = response.text();
+
+    return {
+      message: text,
+      agent: 'chatbot',
+    };
   }
 
   findAll() {
